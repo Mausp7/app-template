@@ -23,18 +23,14 @@ app.use([
     logger
 ]);
 
-
-//mongoose.connect('mongodb://localhost:27017/test', () => {
-//});
-
+/* 
 app.get('/api/public', (req, res) => {
     console.log('Hello Public World!')
     res.send('Hello Public World!');
-
 });
 
 app.get('/api/private', auth({block: true}), (req, res) => {
-
+    
     console.log('Hello Private World!');
     res.send(`Hello ${res.locals.userId}!`);
 });
@@ -42,10 +38,12 @@ app.get('/api/private', auth({block: true}), (req, res) => {
 app.get('/api/prublic', auth({block: false}) , (req, res) => {
     res.send(res.locals.userId ?`Hello ${res.locals.userId}!` : 'Hello Public World!');
 });
-
+ */
 
 app.use(errorHandler);
 
-app.listen(port, () => {
-    console.log(`Listening at ${port}`)
+mongoose.connect('mongodb://localhost:27017/templateDB', () => {
+    app.listen(port, () => {
+        console.log(`Listening at ${port}`)
+    });
 });
