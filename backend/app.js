@@ -1,15 +1,9 @@
-require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
-const mongoose = require('mongoose');
-
 const logger = require('./middleware/logger');
-const auth = require('./middleware/auth');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
-const port = process.env.PORT || 4001;
-
 
 const corsOptions = {
     origin: process.env.APP_URL,
@@ -22,6 +16,12 @@ app.use(express.json());
 app.use([
     logger
 ]);
+
+const userRoutes = require('./route/user');
+app.use('/api/user', userRoutes);
+
+const dashboardRoutes = require('./route/dashboard');
+app.use('/api/dashboards', dashboardRoutes);
 
 /* 
 app.get('/api/public', (req, res) => {
@@ -42,8 +42,4 @@ app.get('/api/prublic', auth({block: false}) , (req, res) => {
 
 app.use(errorHandler);
 
-mongoose.connect('mongodb://localhost:27017/templateDB', () => {
-    app.listen(port, () => {
-        console.log(`Listening at ${port}`)
-    });
-});
+module.exports = app;

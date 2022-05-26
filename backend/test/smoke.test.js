@@ -1,0 +1,53 @@
+const app = require('../app')
+const mockserver = require('supertest');
+const mongoose = require('mongoose');
+const {MongoMemoryServer} = require('mongodb-memory-server');
+
+
+function sum(a, b) {
+    return a + b;
+};
+
+test('adds 1 + 2 to equal 3', () => {
+    // given
+    // no setup required
+
+    // when
+    const result = sum(1, 2);
+
+    // then
+    expect(result).toBe(3);
+});
+
+test('/random returns 404 status code', async () => {
+    //given
+    const server = mockserver(app);
+
+    //when
+    const response = await server.get('/random');
+
+    //then
+    expect(response.status).toBe(404);
+});
+
+test('MongoMemoryServer is online', async () => {
+    //given
+    const mongod = await MongoMemoryServer.create();
+    const uri = mongod.getUri();
+    const connection = await mongoose.connect(uri);
+    
+    const kittySchema = new mongoose.Schema({
+        name: String
+    });
+    const Kitten = mongoose.model('Kitten', kittySchema);
+    const cat = new Kitten({name: "Fluffy"});
+
+    //when
+    await cat.save();
+
+    //then
+    const foundCat = await Kitten.findOne()
+    expect(foundCat.name).toBe('Fluffy');
+    await connection.disconnect();
+    await mongod.stop();
+});

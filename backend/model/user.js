@@ -8,14 +8,14 @@ const todoSchema = new mongoose.Schema({
 
 const dashboardSchema = new mongoose.Schema({
     title: {type: String, required: true}, // "" should not be enough
-    todos: [todoSchema], // default empty list?
+    todos: [todoSchema], // default empty list? yes
 });
 
 const userSchema = new mongoose.Schema({
     username: {type: String, required: true, unique: true}, // "" should not be enough !!!unique
     googleId: {type: String, required: true, unique: true}, // "" should not be enough !!!unique
     //password: {type: String, required: true}, // "" should not be enough, maybe validation
-    dashboards: [dashboardSchema], // default empty list?
+    dashboards: [dashboardSchema], // default empty list? yes
 });
 
 const User = mongoose.model('User', userSchema);
