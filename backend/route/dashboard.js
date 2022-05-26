@@ -9,9 +9,9 @@ router.get('/', auth({block: true}), async (req, res) => {
 
 router.get('/:id', auth({block: true}), async (req, res) => {
     const user = await User.findById(res.locals.userId);
-    const dashboards = user.dashboards.id(req.params.id);
+    const dashboard = user.dashboards.id(req.params.id);
 
-    res.json({dashboards});
+    res.json({dashboard});
 });
 
 router.get('/:id/todos',  auth({block: true}), async (req, res) => {

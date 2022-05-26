@@ -1,5 +1,5 @@
 const auth = ({block}) => (req, res, next) => {
-        console.log('Authenticating...');
+        // console.log('Authenticating...');
         const userId = req.headers.authorization;
         res.locals.userId = userId;
         console.log(`Authenticated, _id:  ${userId}`);

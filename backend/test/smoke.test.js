@@ -8,7 +8,7 @@ function sum(a, b) {
     return a + b;
 };
 
-test('adds 1 + 2 to equal 3', () => {
+test('testing environment cofigured', () => {
     // given
     // no setup required
 
