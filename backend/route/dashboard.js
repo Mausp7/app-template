@@ -52,7 +52,8 @@ router.post('/:id/todos', auth({block: true}), async (req, res) => {
     });
 
     user.save((err) => {
-        if (err) return res.status(500).send(err);
+        console.log(err);
+        if (err) return res.status(501).send(err);
 
         res.json({dashboards: user.dashboards});
     })

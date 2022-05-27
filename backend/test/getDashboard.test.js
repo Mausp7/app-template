@@ -28,7 +28,6 @@ it('should return an empty array dashboards for a new user.', async () => {
     await virtualMongoDb.stop();
 });
 
-
 it('should return a dashboard with matching _id for a user if it exists.', async () => {
     //given
     const virtualMongoDb = await MongoMemoryServer.create();
@@ -182,6 +181,48 @@ it('should return noll if a todo with matching _id from a users dashboard does n
 
     //then
     expect(response.body.todo).toBe(null);
+
+    await connectionVirtualMongoDb.disconnect();
+    await virtualMongoDb.stop();
+});
+
+it('should create todo.', async () => {
+    //given
+    const virtualMongoDb = await MongoMemoryServer.create();
+    const uri = virtualMongoDb.getUri();
+    const connectionVirtualMongoDb = await mongoose.connect(uri);
+
+    const newUser = new User({
+        username: "testUser",
+        googleId: "testGoogle",
+        dashboards: [
+            {
+                title: "testDashboard"
+            }
+        ]
+    });
+    await newUser.save();
+
+    const client = mockserver.agent(app);
+    client.set('authorization', newUser._id);
+    //client.set('content-type', "application-JSON");
+
+    //when
+    const response = await client.post(`/api/dashboards/${newUser.dashboards[0]._id}/todos`)
+        .send({
+            title: "testTodo",
+            content: "testContent"
+    });
+
+    //then
+    expect(response.status).toBe(200);
+    expect(response.body.dashboards[0].todos).toHaveLength(1);
+    expect(response.body.dashboards[0].todos[0]._id).not.toBeNull();
+
+    const userInDb = await User.findById(newUser._id);
+    expect(userInDb.dashboards[0].todos).toHaveLength(1);
+    expect(userInDb.dashboards[0].todos[0]._id).not.toBeNull();
+    expect(userInDb.dashboards[0].todos[0]._id.toString()).toBe(response.body.dashboards[0].todos[0]._id);
 
     await connectionVirtualMongoDb.disconnect();
     await virtualMongoDb.stop();
