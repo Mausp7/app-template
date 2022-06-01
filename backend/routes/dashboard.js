@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const auth = require('../middleware/auth');
-const User = require('../model/user')
+const auth = require('../middlewares/auth');
+const User = require('../models/user')
 
 router.get('/', auth({block: true}), async (req, res) => {
     const user = await User.findById(res.locals.userId);
@@ -52,7 +52,7 @@ router.post('/:id/todos', auth({block: true}), async (req, res) => {
     });
 
     user.save((err) => {
-        console.log(err);
+        // console.log(err);
         if (err) return res.status(501).send(err);
 
         res.json({dashboards: user.dashboards});

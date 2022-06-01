@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const logger = require('./middleware/logger');
-const errorHandler = require('./middleware/errorHandler');
+const logger = require('./middlewares/logger');
+const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 
@@ -17,10 +17,10 @@ app.use([
     logger
 ]);
 
-const userRoutes = require('./route/user');
+const userRoutes = require('./routes/user');
 app.use('/api/user', userRoutes);
 
-const dashboardRoutes = require('./route/dashboard');
+const dashboardRoutes = require('./routes/dashboard');
 app.use('/api/dashboards', dashboardRoutes);
 
 /* 
