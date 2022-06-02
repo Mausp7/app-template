@@ -8,13 +8,12 @@ const http = baseurl => {
 
     const post = async (url, body) => {
         try {
-            const response = await axion.post(url, body);
+            const response = await instance.post(url, body);
             return response;
         } catch (error) {
-            console.log(error)
-            if (!err.response) return res.sendStatus(500);
-            
-            return res.sendStatus(401);
+            if (!error.response) return error;
+            console.log(error.response)
+            return error.response;
         };
     };
 

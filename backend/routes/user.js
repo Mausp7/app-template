@@ -7,10 +7,10 @@ const jwt = require('jsonwebtoken');
 
 const config = {
     google: {
-        clientId : "",
-        clientSecret: "secret",
-        redirectURI: "",
-        tokenEndpoint: "",
+        clientId : "423125049963-vnhlm59vvirdjsquu0efhqvq5u91orks.apps.googleusercontent.com",
+        clientSecret: "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",
+        redirectUri: "http://localhost:3000/callback",
+        tokenEndpoint: "https://oauth2.googleapis.com/token",
         grantType: "authorization code",
     },
 };
@@ -30,6 +30,7 @@ router.post('/login', async (req, res) => {
         "client_secret": config[provider].clientSecret,
         "redirect_uri": config[provider].redirectUri,
         "grant_type": "authorization_code",
+        //"scope": "openid"
     });
 
     if (!response) return res.sendStatus(500);
@@ -37,14 +38,13 @@ router.post('/login', async (req, res) => {
 
     const decoded = jwt.decode(response.data.id_token);
     if (!decoded) return res.sendStatus(500);
+    console.log(decoded)
 
     const user = await User.findOneAndUpdate({[`providers.${provider}`]: decoded.sub}, {
         providers: {
             [provider]: decoded.sub,
         }
-    }, {upsert: true}, (err, doc) => {
-        if (err) return res.status(500).json({error: err});
-    });
+    }, {upsert: true, new: true});
 
     const token = jwt.sign({"userId": user._id, "providers": user.providers}, process.env.JWT_SECRET, {expiresIn: '1h'})
 

@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     username: {type: String}, // "" should not be enough !!!unique
     providers: {
         google: {type: String, unique: true},
-        facebook: {type: String, unique: true},
+        //facebook: {type: String, unique: true},
     },
     //password: {type: String, required: true}, // "" should not be enough, maybe validation
     dashboards: [dashboardSchema], // default empty list? yes
