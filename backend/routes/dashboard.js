@@ -3,33 +3,33 @@ const auth = require('../middlewares/auth');
 const User = require('../models/user')
 
 router.get('/', auth({block: true}), async (req, res) => {
-    const user = await User.findById(res.locals.userId);
+    const user = await User.findById(res.locals.user.userId);
     res.json({user});
 });
 
 router.get('/:id', auth({block: true}), async (req, res) => {
-    const user = await User.findById(res.locals.userId);
+    const user = await User.findById(res.locals.user.userId);
     const dashboard = user.dashboards.id(req.params.id);
 
     res.json({dashboard});
 });
 
 router.get('/:id/todos',  auth({block: true}), async (req, res) => {
-    const user = await User.findById(res.locals.userId);
+    const user = await User.findById(res.locals.user.userId);
     const todos = user.dashboards.id(req.params.id).todos;
 
     res.json({todos});
 }); 
 
 router.get('/:id/todos/:todoId', auth({block: true}), async (req, res) => {
-    const user = await User.findById(res.locals.userId);
+    const user = await User.findById(res.locals.user.userId);
     const todo = user.dashboards.id(req.params.id).todos.id(req.params.todoId);
 
     res.json({todo});
 });
 
 router.post('/', auth({block: true}), async (req, res) => {
-    const user = await User.findById(res.locals.userId);
+    const user = await User.findById(res.locals.user.userId);
 
     user.dashboards.push({
         title: req.body.title
@@ -43,7 +43,7 @@ router.post('/', auth({block: true}), async (req, res) => {
 });
 
 router.post('/:id/todos', auth({block: true}), async (req, res) => {
-    const user = await User.findById(res.locals.userId);
+    const user = await User.findById(res.locals.user.userId);
     if (!user.dashboards.id(req.params.id)) return res.sendStatus(404)
 
     user.dashboards.id(req.params.id).todos.push({
@@ -72,7 +72,7 @@ router.patch('/api/dashboards/:id/todos/:todoId', async (req, res) => {
 });
 
 router.delete('/:id', auth({block: true}), async (req, res) => {
-    const user = await User.findById(res.locals.userId);
+    const user = await User.findById(res.locals.user.userId);
 
     user.dashboards.pull(req.params.id);
 
@@ -84,7 +84,7 @@ router.delete('/:id', auth({block: true}), async (req, res) => {
 });
 
 router.delete('/:id/todos/:todoId', auth({block: true}), async (req, res) => {
-    const user = await User.findById(res.locals.userId);
+    const user = await User.findById(res.locals.user.userId);
     console.log(user.dashboards.id(req.params.id))
     if (!user.dashboards.id(req.params.id)) return res.sendStatus(404)
 

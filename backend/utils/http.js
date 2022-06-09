@@ -12,7 +12,7 @@ const http = baseurl => {
             return response;
         } catch (error) {
             if (!error.response) return error;
-            console.log(error.response)
+            //console.log(error.response)
             return error.response;
         };
     };

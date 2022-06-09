@@ -1,7 +1,10 @@
+require('dotenv').config();
 const app = require('../app')
 const mockserver = require('supertest');
+const mongoose = require('mongoose');
 const User = require('../models/user');
-const {startVirtualDb, stopVirtualDb, clearUsers} = require('./utils/inMemoryDb')
+const {startVirtualDb, stopVirtualDb, clearUsers} = require('./utils/inMemoryDb');
+const jwt = require("jsonwebtoken");
 
 describe('/api/dashboard GET test', () => {
     let connection;
@@ -20,14 +23,21 @@ describe('/api/dashboard GET test', () => {
 
     afterEach(async () => await clearUsers(User));
 
+
     it('should return an empty array dashboards for a new user.', async () => {
         //given
         const newUser = new User({
-            username: "testUser", googleId: "testGoogle"
+            username: "testUser",
+            providers: {
+                google: null,
+                facebook: null
+            }
         });
         await newUser.save();
-        
-        client.set('authorization', newUser._id);
+
+
+        const token = jwt.sign({userId: newUser._id}, process.env.JWT_SECRET);
+        client.set('authorization', token);
         
         //when
         const response = await client.get('/api/dashboards')
@@ -40,11 +50,16 @@ describe('/api/dashboard GET test', () => {
         //given
         
         const newUser = new User({
-            username: "testUser", googleId: "testGoogle"
+            username: "testUser",
+            providers: {
+                google: null,
+                facebook: null
+            }
         });
         await newUser.save();
         
-        client.set('authorization', newUser._id);
+        const token = jwt.sign({userId: newUser._id}, process.env.JWT_SECRET);
+        client.set('authorization', token);
 
         await User.deleteMany();
         
@@ -62,7 +77,10 @@ describe('/api/dashboard GET test', () => {
         //given
         const newUser = new User({
             username: "testUser",
-            googleId: "testGoogle",
+            providers: {
+                google: null,
+                facebook: null
+            },
             dashboards: [
                 {
                     title: "testDashboard"
@@ -75,7 +93,8 @@ describe('/api/dashboard GET test', () => {
         await newUser.save();
 
         const client = mockserver.agent(app);
-        client.set('authorization', newUser._id);
+        const token = jwt.sign({userId: newUser._id}, process.env.JWT_SECRET);
+        client.set('authorization', token);
 
         //when
         const response = await client.get(`/api/dashboards/${newUser.dashboards[0]._id}`)
@@ -88,12 +107,16 @@ describe('/api/dashboard GET test', () => {
         //given
         const newUser = new User({
             username: "testUser",
-            googleId: "testGoogle",
+            providers: {
+                google: null,
+                facebook: null
+            }
         });
         await newUser.save();
 
         const client = mockserver.agent(app);
-        client.set('authorization', newUser._id);
+        const token = jwt.sign({userId: newUser._id}, process.env.JWT_SECRET);
+        client.set('authorization', token);
 
         //when
         const response = await client.get(`/api/dashboards/invalidId`)
@@ -106,7 +129,10 @@ describe('/api/dashboard GET test', () => {
         //given
         const newUser = new User({
             username: "testUser",
-            googleId: "testGoogle",
+            providers: {
+                google: null,
+                facebook: null
+            },
             dashboards: [
                 {
                     title: "testDashboard"
@@ -116,7 +142,8 @@ describe('/api/dashboard GET test', () => {
         await newUser.save();
 
         const client = mockserver.agent(app);
-        client.set('authorization', newUser._id);
+        const token = jwt.sign({userId: newUser._id}, process.env.JWT_SECRET);
+        client.set('authorization', token);
 
         //when
         const response = await client.get(`/api/dashboards/${newUser.dashboards[0]._id}/todos`)
@@ -129,7 +156,10 @@ describe('/api/dashboard GET test', () => {
         //given
         const newUser = new User({
             username: "testUser",
-            googleId: "testGoogle",
+            providers: {
+                google: null,
+                facebook: null
+            },
             dashboards: [
                 {
                     title: "testDashboard",
@@ -149,7 +179,8 @@ describe('/api/dashboard GET test', () => {
         await newUser.save();
 
         const client = mockserver.agent(app);
-        client.set('authorization', newUser._id);
+        const token = jwt.sign({userId: newUser._id}, process.env.JWT_SECRET);
+        client.set('authorization', token);
 
         //when
         const response = await client.get(`/api/dashboards/${newUser.dashboards[0]._id}/todos/${newUser.dashboards[0].todos[0]._id}`)
@@ -162,7 +193,10 @@ describe('/api/dashboard GET test', () => {
         //given
         const newUser = new User({
             username: "testUser",
-            googleId: "testGoogle",
+            providers: {
+                google: null,
+                facebook: null
+            },
             dashboards: [
                 {
                     title: "testDashboard",
@@ -172,7 +206,8 @@ describe('/api/dashboard GET test', () => {
         await newUser.save();
 
         const client = mockserver.agent(app);
-        client.set('authorization', newUser._id);
+        const token = jwt.sign({userId: newUser._id}, process.env.JWT_SECRET);
+        client.set('authorization', token);
 
         //when
         const response = await client.get(`/api/dashboards/${newUser.dashboards[0]._id}/todos/invalidTodoId`)
@@ -185,7 +220,10 @@ describe('/api/dashboard GET test', () => {
         //given
         const newUser = new User({
             username: "testUser",
-            googleId: "testGoogle",
+            providers: {
+                google: null,
+                facebook: null
+            },
             dashboards: [
                 {
                     title: "testDashboard"
@@ -195,7 +233,8 @@ describe('/api/dashboard GET test', () => {
         await newUser.save();
 
         const client = mockserver.agent(app);
-        client.set('authorization', newUser._id);
+        const token = jwt.sign({userId: newUser._id}, process.env.JWT_SECRET);
+        client.set('authorization', token);
         //client.set('content-type', "application-JSON");
 
         //when
@@ -215,4 +254,30 @@ describe('/api/dashboard GET test', () => {
         expect(userInDb.dashboards[0].todos[0]._id).not.toBeNull();
         expect(userInDb.dashboards[0].todos[0]._id.toString()).toBe(response.body.dashboards[0].todos[0]._id);
     }); 
+
+
+    it('should return an error with code 500 if DB is not connected.', async () => {
+        //given
+        const newUser = new User({
+            username: "testUser",
+            providers: {
+                google: null,
+                facebook: null
+            }
+        });
+        await newUser.save();
+        
+        const token = jwt.sign({userId: newUser._id}, process.env.JWT_SECRET);
+        client.set('authorization', token);
+        await connection.disconnect();
+
+        //when
+        const response = await client.get('/api/dashboards')
+        
+        //then
+        expect(response.statusCode).toBe(500);
+
+        const uri = mongodb.getUri();
+        connection = await mongoose.connect(uri);
+    });
 });

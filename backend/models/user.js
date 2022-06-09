@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const todoSchema = new mongoose.Schema({
     title: {type: String, required: true}, // "" should not be enough
     content: {type: String, required: true}, // "" is enough
-    isdone: {type: Boolean, required: true, default: false},
+    isDone: {type: Boolean, required: true, default: false},
 });
 
 const dashboardSchema = new mongoose.Schema({

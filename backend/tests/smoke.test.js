@@ -1,3 +1,4 @@
+require('dotenv').config();
 const app = require('../app')
 const mockserver = require('supertest');
 const mongoose = require('mongoose');

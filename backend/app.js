@@ -1,7 +1,9 @@
 const express = require("express");
+require('express-async-errors');
 const cors = require("cors");
-const logger = require('./middlewares/logger');
+//const logger = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
+const morgan = require('morgan');
 
 const app = express();
 
@@ -14,7 +16,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use([
-    logger
+    morgan(':method :url :status :res[content-length] - :response-time ms'),
 ]);
 
 const userRoutes = require('./routes/user');
