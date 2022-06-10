@@ -1,10 +1,9 @@
-const logger = ('../utils/logger');
+const logger = require('../utils/logger');
 
 const errorHandler  = (err, req, res, next) => { 
-    clg(err)
+    console.log(err)
     logger.error(new Error("render error"), err.toString());
-    //console.log(err);
-    //res.status(500).json("Something went wrong...");
+    res.status(500).json(err);
 };
 
 module.exports = errorHandler;

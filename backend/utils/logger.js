@@ -22,5 +22,4 @@ const logger = pino({
     }
 }, stream);
 
-
 module.exports = logger;
