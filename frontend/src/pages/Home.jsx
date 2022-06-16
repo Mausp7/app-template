@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useCounter } from "../providers/counter";
 import { useAuth } from "../providers/auth";
 
@@ -8,12 +8,7 @@ import useCounterLocal from "../hooks/useCounter";
 
 const Home = () => {
 	const { value, increment, decrement } = useCounter();
-	const { token, auth, resumeSession, logout } = useAuth();
-
-	useEffect(() => {
-		resumeSession();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	const { token } = useAuth();
 
 	const {
 		value: counter,
@@ -26,8 +21,6 @@ const Home = () => {
 			Home
 			<p>{token ? " Logged in" : "Anonymus user"}</p>
 			<h1>Hello world!</h1>
-			{!token && <button onClick={auth}>Google Login</button>}
-			{token && <button onClick={logout}>Logout</button>}
 			<h3>Change the value:</h3>
 			<button
 				onClick={increment}

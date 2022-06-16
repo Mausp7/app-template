@@ -1,9 +1,14 @@
-import { useState, useContext, createContext } from "react";
+import { useState, useEffect, useContext, createContext } from "react";
 import axios from "axios";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
 	const [token, setToken] = useState(null);
+
+	useEffect(() => {
+		const token = localStorage.getItem("tokenJWT");
+		if (token) setToken(token);
+	}, []);
 
 	const auth = () => {
 		const goodleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth`;
@@ -31,23 +36,18 @@ const AuthProvider = ({ children }) => {
 				}
 			);
 			setToken(response.data);
-			sessionStorage.setItem("tokenJWT", response.data);
+			localStorage.setItem("tokenJWT", response.data);
 		} catch (error) {
 			setToken(null);
 		}
 	};
 
-	const resumeSession = () => {
-		const token = sessionStorage.getItem("tokenJWT");
-		if (token) setToken(token);
-	};
-
 	const logout = () => {
 		setToken(null);
-		sessionStorage.removeItem("tokenJWT");
+		localStorage.removeItem("tokenJWT");
 	};
 
-	const contextValue = { token, auth, login, resumeSession, logout };
+	const contextValue = { token, auth, login, logout };
 
 	return (
 		<AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
