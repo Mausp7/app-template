@@ -14,7 +14,7 @@ const Redirect = () => {
 			if (code) {
 				await login(code, "google");
 			}
-			navigate("/");
+			navigate("/profile");
 		};
 
 		getToken();

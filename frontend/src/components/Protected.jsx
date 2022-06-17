@@ -1,18 +1,21 @@
 import { useAuth } from "../providers/auth";
-import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { Navigate, useLocation } from "react-router";
 
 const Protected = ({ children }) => {
-	const { token } = useAuth();
-	const navigate = useNavigate();
+	const { token, user } = useAuth();
+	const location = useLocation();
 
-	useEffect(() => {
-		if (!token) {
-			navigate("/");
-		}
-	}, [token]); //lefut először, es ha valtozik a token
-
-	return <div>{children}</div>;
+	return (
+		<>
+			{!token ? (
+				<Navigate to={"/"} />
+			) : !user.userId && location.pathname !== "/register" ? (
+				<Navigate to={"/register"} />
+			) : (
+				children
+			)}
+		</>
+	);
 };
 
 export default Protected;

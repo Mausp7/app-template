@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
 import Redirect from "./pages/Redirect";
+import Register from "./pages/Register";
 
 import "./App.css";
 
@@ -24,6 +25,14 @@ function App() {
 					}
 				/>
 				<Route path="/redirect" element={<Redirect />} />
+				<Route
+					path="/register"
+					element={
+						<Protected>
+							<Register />
+						</Protected>
+					}
+				/>
 			</Routes>
 		</div>
 	);

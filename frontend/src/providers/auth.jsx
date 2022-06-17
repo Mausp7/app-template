@@ -1,13 +1,19 @@
 import { useState, useEffect, useContext, createContext } from "react";
 import axios from "axios";
+import jwt from "jwt-decode";
+import { toDoApi } from "../api/toDoApi";
+
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
 	const [token, setToken] = useState(null);
+	const [user, setUser] = useState(null);
+	const { post } = toDoApi();
 
 	useEffect(() => {
-		const token = localStorage.getItem("tokenJWT");
-		if (token) setToken(token);
+		const tokenFronStorage = localStorage.getItem("tokenJWT");
+		if (tokenFronStorage) setToken(tokenFronStorage);
+		if (tokenFronStorage) setUser(jwt(tokenFronStorage));
 	}, []);
 
 	const auth = () => {
@@ -23,6 +29,7 @@ const AuthProvider = ({ children }) => {
 		searchParams.append("promt", "select_account");
 		console.log(searchParams);
 		const fullUrl = goodleAuthUrl + "?" + searchParams;
+		//window.location.href = fullUrl;
 		window.open(fullUrl, "_self");
 	};
 
@@ -37,8 +44,21 @@ const AuthProvider = ({ children }) => {
 			);
 			setToken(response.data);
 			localStorage.setItem("tokenJWT", response.data);
+			setUser(jwt(response.data));
 		} catch (error) {
 			setToken(null);
+		}
+	};
+
+	const register = async (username) => {
+		const response = await post("/user/create", {
+			username,
+		});
+
+		if (response?.status === 200) {
+			setToken(response.data);
+			localStorage.setItem("tokenJWT", response.data);
+			setUser(jwt(response.data));
 		}
 	};
 
@@ -47,7 +67,7 @@ const AuthProvider = ({ children }) => {
 		localStorage.removeItem("tokenJWT");
 	};
 
-	const contextValue = { token, auth, login, logout };
+	const contextValue = { token, user, auth, login, logout, register };
 
 	return (
 		<AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
